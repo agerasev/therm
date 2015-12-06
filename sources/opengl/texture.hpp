@@ -74,19 +74,19 @@ public:
 		_type = type;
 	}
 	
-	GLuint getID() {
+	GLuint id() {
 		return _id;
 	}
-	int getWidth() const {
+	int width() const {
 		return _width;
 	}
-	int getHeight() const {
+	int height() const {
 		return _height;
 	}
-	Type getType() const {
+	Type type() const {
 		return _type;
 	}
-	Format getFormat() const {
+	Format format() const {
 		return _format;
 	}
 };

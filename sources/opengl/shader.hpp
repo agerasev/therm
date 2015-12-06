@@ -24,10 +24,10 @@ public:
 private:
 	GLuint _id = 0;
 	std::string _name = "";
-	std::list<Variable> attribs, uniforms;
+	std::list<Variable> _attribs, _uniforms;
 	
 public:
-	Shader(Type type)
+	Shader(Shader::Type type)
 	{
 		GLuint t;
 		switch(type) {
@@ -86,20 +86,20 @@ public:
 		}
 	}
 	
-	GLuint getID() {
+	GLuint id() {
 		return _id;
 	}
-	const std::list<Variable> &getAttributes() const {
-		return attribs;
+	const std::list<Variable> &attributes() const {
+		return _attribs;
 	}
-	const std::list<Variable> &getUniforms() const {
-		return uniforms;
+	const std::list<Variable> &uniforms() const {
+		return _uniforms;
 	}
 	
 	void setName(const std::string &name) {
 		_name = name;
 	}
-	std::string getName() const {
+	std::string name() const {
 		return _name;
 	}
 	
@@ -116,7 +116,7 @@ private:
 			Variable var;
 			var.name = match[2];
 			var.type = match[1];
-			attribs.push_back(var);
+			_attribs.push_back(var);
 			string = match.suffix().str();
 		}
 		
@@ -127,7 +127,7 @@ private:
 			Variable var;
 			var.name = match[2];
 			var.type = match[1];
-			uniforms.push_back(var);
+			_uniforms.push_back(var);
 			string = match.suffix().str();
 		}
 	}

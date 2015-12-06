@@ -6,7 +6,6 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -Wall")
 
 set(SOURCES
 	sources/main.cpp
-	sources/graphics.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

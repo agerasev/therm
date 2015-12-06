@@ -4,7 +4,7 @@
 #include <exception>
 
 namespace gl {
-class Exception {
+class Exception : public std::exception {
 private:
 	std::string msg;
 	
@@ -21,7 +21,7 @@ public:
 	}
 };
 
-class FileNotFoundException : Exception {
+class FileNotFoundException : public Exception {
 private:
 	std::string fn;
 public:
