@@ -29,11 +29,12 @@ public:
 		  0, 1, 1, 0, 1, 1
 		};
 		buf.loadData(vertex_data, 12);
+		prog.setAttribute("vertex", &buf);
 		
-		prog.setAttribute("vertex", buf);
-		float transform_data[] = {1, 0, 0, 1};
+		float transform_data[] = {2, 0, 0, 2};
 		prog.setUniform("transform", transform_data, 4);
-		float translate_data[] = {0, 0};
+		
+		float translate_data[] = {-1, -1};
 		prog.setUniform("translate", translate_data, 2);
 		
 		glClearColor(0.0f,0.0f,0.0f,1.0f);

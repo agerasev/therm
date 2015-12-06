@@ -79,13 +79,13 @@ int main(int, char *[]) {
 	  SDL_WINDOWPOS_CENTERED,
 	  SDL_WINDOWPOS_CENTERED,
 	  800, 600,
-	  SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
+	  SDL_WINDOW_OPENGL// | SDL_WINDOW_RESIZABLE
 	);
 	Context context(window);
 	GLEW glew;
 	Graphics gfx;
 	
-	bool done = true;//false;
+	bool done = false;
 	while(!done) {
 		SDL_Event event;
 		while(!SDL_PollEvent(&event)) {
@@ -98,5 +98,5 @@ int main(int, char *[]) {
 		context.swap();
 	}
 	
-	exit(0);
+	return 0;
 }
