@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cstdio>
+#include <functional>
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
@@ -64,8 +65,8 @@ public:
 			fprintf(stderr, "Could not init GLEW: %s\n", glewGetErrorString(status));
 			exit(1);
 		}
-		if(!GLEW_VERSION_2_0) {
-			fprintf(stderr, "OpenGL 2.0 support not found\n");
+		if(!GLEW_VERSION_3_0) {
+			fprintf(stderr, "OpenGL 3.0 support not found\n");
 			exit(1);
 		}
 	}
@@ -74,23 +75,33 @@ public:
 
 int main(int, char *[]) {
 	SDL sdl;
+	int width = 800, height = 800;
 	Window window(
 	  "Thermal Conductivity Simulation",
 	  SDL_WINDOWPOS_CENTERED,
 	  SDL_WINDOWPOS_CENTERED,
-	  800, 600,
-	  SDL_WINDOW_OPENGL// | SDL_WINDOW_RESIZABLE
+	  width, height,
+	  SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
 	);
 	Context context(window);
 	GLEW glew;
 	Graphics gfx;
+	gfx.resize(width, height);
 	
 	bool done = false;
 	while(!done) {
 		SDL_Event event;
-		while(!SDL_PollEvent(&event)) {
+		while(SDL_PollEvent(&event)) {
 			if(event.type == SDL_QUIT) {
 				done = true;
+			} else if(event.type == SDL_KEYDOWN) {
+				if(event.key.keysym.sym == SDLK_ESCAPE) {
+					done = true;
+				}
+			} else if(event.type == SDL_WINDOWEVENT) {
+				if(event.window.event == SDL_WINDOWEVENT_RESIZED) {
+					gfx.resize(event.window.data1, event.window.data2);
+				}
 			}
 		}
 		

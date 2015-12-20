@@ -2,6 +2,8 @@
 
 #include <GL/glew.h>
 
+#include <cstdio>
+
 namespace gl {
 class Texture {
 public:
@@ -13,6 +15,10 @@ public:
 		UBYTE,
 		FLOAT
 	};
+	enum Interpolation {
+		LINEAR,
+		NEAREST
+	};
 
 private:
 	GLuint _id = 0;
@@ -23,6 +29,7 @@ private:
 public:
 	Texture() {
 		glGenTextures(1, &_id);
+		
 	}
 	virtual ~Texture() {
 		glDeleteTextures(1, &_id);
@@ -35,13 +42,13 @@ public:
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	
-	void loadData(const void *data, int width, int height, Format format, Type type) {
+	void loadData(const void *data, int width, int height, Format format, Type type, Interpolation inp = LINEAR) {
 		bind();
 		
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		setInterpolation(inp);
 		
 		GLuint ifmt;
 		GLuint fmt, t;
@@ -66,15 +73,25 @@ public:
 		
 		glTexImage2D(GL_TEXTURE_2D, 0, ifmt, width, height, 0, fmt, t, data);
 		
-		unbind();
-		
 		_width = width;
 		_height = height;
 		_format = format;
 		_type = type;
 	}
 	
-	GLuint id() {
+	void setInterpolation(Interpolation inp) const {
+		bind();
+		switch(inp) {
+		case LINEAR:
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			break;
+		case NEAREST:
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			break;
+		}
+	}
+
+	GLuint id() const {
 		return _id;
 	}
 	int width() const {

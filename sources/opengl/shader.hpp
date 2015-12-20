@@ -86,7 +86,7 @@ public:
 		}
 	}
 	
-	GLuint id() {
+	GLuint id() const {
 		return _id;
 	}
 	const std::list<Variable> &attributes() const {
@@ -110,23 +110,23 @@ private:
 		std::regex expr;
 	
 		string = std::string(source);
-		expr = "attribute[ \t\n]*([^ \t\n]*)[ \t\n]*([^ \t\n;]*)[ \t\n]*;";
+		expr = "(^|\n)[ \t]*attribute[ \t\n]*([^ \t\n]*)[ \t\n]*([^ \t\n;]*)[ \t\n]*;";
 		while(std::regex_search(string, match, expr))
 		{
 			Variable var;
-			var.name = match[2];
-			var.type = match[1];
+			var.name = match[3];
+			var.type = match[2];
 			_attribs.push_back(var);
 			string = match.suffix().str();
 		}
 		
 		string = std::string(source);
-		expr = "uniform[ \t\n]*([^ \t\n]*)[ \t\n]*([^ \t\n;]*)[ \t\n]*;";
+		expr = "(^|\n)[ \t]*uniform[ \t\n]*([^ \t\n]*)[ \t\n]*([^ \t\n;]*)[ \t\n]*;";
 		while(std::regex_search(string, match, expr))
 		{
 			Variable var;
-			var.name = match[2];
-			var.type = match[1];
+			var.name = match[3];
+			var.type = match[2];
 			_uniforms.push_back(var);
 			string = match.suffix().str();
 		}

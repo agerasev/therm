@@ -35,8 +35,9 @@ public:
 		union {
 			float   fdata[16];
 			int     idata[16];
-			Texture *tex;
 		};
+		const Texture *tex = nullptr;
+		int texno = 0;
 	};
 private:
 	GLuint _id;
@@ -83,7 +84,7 @@ public:
 		glUseProgram(0);
 	}
 	
-	GLuint id() {
+	GLuint id() const {
 		return _id;
 	}
 
@@ -146,6 +147,13 @@ private:
 				}
 			}
 		}
+		int texno = 0;
+		for(auto &pair : _uniforms) {
+			if(pair.second.kind == Variable::SAMPLER) {
+				pair.second.texno = texno;
+				++texno;
+			}
+		}
 	}
 	void _getVariablesID() throw(Exception) {
 		for(auto i = _attribs.begin(); i != _attribs.end(); ++i) {
@@ -172,8 +180,10 @@ public:
 	
 private:
 	void _loadUniform(const UniformVariable &var) {
-		if(var.kind == Variable::SAMPLER) {
-			
+		if(var.kind == Variable::SAMPLER && var.tex != nullptr) {
+			glActiveTexture(GL_TEXTURE0 + var.texno);
+			glUniform1i(var.id, var.texno);
+			var.tex->bind();
 			return;
 		}
 		switch(var.type) {
@@ -333,10 +343,10 @@ public:
 	}
 	
 	template <typename T>
-	void setUniform(const std::string &name, T data) {
+	typename std::enable_if<std::is_arithmetic<T>::value, void>::type setUniform(const std::string &name, T data) {
 		setUniform(name, &data, 1);
 	}
-	void setUniform(const std::string &name, Texture *tex) {
+	void setUniform(const std::string &name, const Texture *tex) {
 		auto iter = _uniforms.find(name);
 		if(iter == _uniforms.end())
 			throw Exception("No such uniform '" + name + "'");

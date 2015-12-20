@@ -41,7 +41,7 @@ public:
 		glDrawArrays(GL_TRIANGLES, 0, _size);
 	}
 	
-	GLuint id() {
+	GLuint id() const {
 		return _id;
 	}
 	long size() const {
