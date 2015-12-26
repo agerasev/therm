@@ -7,7 +7,6 @@
 #include <map>
 #include <functional>
 
-#include <SDL2/SDL.h>
 #include <GL/glew.h>
 
 #include "opengl/program.hpp"
@@ -88,7 +87,7 @@ public:
 		float map_data[]    = {2, 0, 0, 2};
 		float offset_data[] = {-1, -1};
 		
-		static const int sx = 512, sy = 512;
+		static const int sx = 256, sy = 256;
 		int area_size_data[] = {sx, sy};
 		
 		programs["draw"]->setAttribute("a_vertex", &buf);
@@ -108,28 +107,28 @@ public:
 		double ir = 0.4;
 		std::function<double(double)> 
 		inner = [](double a) {
-			return 0.5*(1.0 + cos(2.0*a));
+			return 0.5*(1.0 + cos(2*a));
 		}, 
 		outer = [](double a) {
-			return 0.5*(1.0 - sin(a));
+			return 0.5*(1.0 - sin(2*a));
 		};
 		float *data = new float[3*sx*sy];
 		for(int iy = 0; iy < sy; ++iy) {
-			for(int ix = 0; ix < sy; ++ix) {
+			for(int ix = 0; ix < sx; ++ix) {
 				double x = 2.1*(double(ix)/sx - 0.5), y = 2.1*(double(iy)/sy - 0.5);
 				double r = sqrt(x*x + y*y);
 				double a = atan2(y, x);
 				if(r > 1.0) {
 					data[3*(iy*sx + ix) + 0] = outer(a);
-					data[3*(iy*sx + ix) + 1] = 0;
+					data[3*(iy*sx + ix) + 1] = 0.0;
 				} else if(r < ir) {
 					data[3*(iy*sx + ix) + 0] = inner(a);
-					data[3*(iy*sx + ix) + 1] = 0;
+					data[3*(iy*sx + ix) + 1] = 0.0;
 				} else {
-					data[3*(iy*sx + ix) + 0] = 0;
-					data[3*(iy*sx + ix) + 1] = 1;
+					data[3*(iy*sx + ix) + 0] = 0.0;
+					data[3*(iy*sx + ix) + 1] = 1.0;
 				}
-				data[3*(iy*sx + ix) + 2] = 0;
+				data[3*(iy*sx + ix) + 2] = 0.0;
 			}
 		}
 		tex.loadData(data, sx, sy, gl::Texture::RGB, gl::Texture::FLOAT, gl::Texture::NEAREST);
@@ -166,7 +165,7 @@ public:
 	void render() {
 		glClear(GL_COLOR_BUFFER_BIT);
 		
-		for(int i = 0; i < 0x100; ++i) {
+		for(int i = 0; i < 0x80; ++i) {
 			fb[1]->bind();
 			programs["diffuse"]->setUniform("u_source", fb[0]->getTexture());
 			programs["diffuse"]->evaluate();
@@ -182,4 +181,25 @@ public:
 		glFlush();
 	}
 	
+	void writeFile(const std::string &fn) {
+		FILE *f = fopen(fn.c_str(), "w");
+		if(f == nullptr) {
+			perror("error write file");
+			return;
+		}
+		const gl::Texture *t = fb[0]->getTexture();
+		int sx = t->width(), sy = t->height();
+		float *data = new float[3*sx*sy];
+		fb[0]->bind();
+		glReadPixels(0, 0, sx, sy, GL_RGB, GL_FLOAT, data);
+		for(int iy = 0; iy < sy; iy+=4) {
+			for(int ix = 0; ix < sx; ix+=4) {
+				fprintf(f, "%f ", data[3*(sx*iy + ix) + 0]);
+			}
+			fprintf(f, "\n");
+		}
+		gl::FrameBuffer::unbind();
+		delete[] data;
+		fclose(f);
+	}
 };

@@ -109,5 +109,7 @@ int main(int, char *[]) {
 		context.swap();
 	}
 	
+	gfx.writeFile("out.txt");
+	
 	return 0;
 }
